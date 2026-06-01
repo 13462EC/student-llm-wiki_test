@@ -1,0 +1,13 @@
+{
+  "name": "student-llm-wiki",
+  "owner": {
+    "name": "Ruizhe"
+  },
+  "plugins": [
+    {
+      "name": "student-llm-wiki",
+      "source": "./",
+      "description": "Student knowledge wiki — Karpathy LLM Wiki pattern with Feynman review, exam prep, confidence decay, and cross-course connections."
+    }
+  ]
+}
