@@ -74,7 +74,7 @@ A single SCHEMA file was loaded fully into context every operation (~3000 tokens
 
 ```bash
 # Add this repo as a marketplace
-claude plugin marketplace add YOUR_USERNAME/student-llm-wiki
+claude plugin marketplace add IssacW228/student-llm-wiki
 # Install the plugin
 claude plugin install student-llm-wiki@student-llm-wiki
 ```
@@ -92,12 +92,12 @@ Then open your vault folder, drop slides into `raw/`, and use the slash commands
 
 | Command | What it does |
 |---------|-------------|
-| `/ingest raw/COMP6713/L3.pdf` | Digest a source. Dedup + concept pages + cross-course links. |
+| `/ingest raw/COMPXXXX/L3.pdf` | Digest a source. Dedup + concept pages + cross-course links. |
 | `/lint` | Health check: orphans, broken links, contradictions, confidence decay. |
-| `/review COMP9417` | Feynman quiz mode. Adjusts confidence, generates practice questions. |
-| `/exam-prep COMP4337` | Generate practice questions from weak concepts. |
+| `/review COMPXXXX` | Feynman quiz mode. Adjusts confidence, generates practice questions. |
+| `/exam-prep COMPXXXX` | Generate practice questions from weak concepts. |
 
-You can also just say "ingest this file" or "quiz me on COMP9417" in natural language — the skills trigger automatically.
+You can also just say "ingest this file" or "quiz me on COMPXXXX" in natural language — the skills trigger automatically.
 
 ### Adding your own courses
 
@@ -177,7 +177,7 @@ student-llm-wiki/
 
 ```bash
 # 把本仓库添加为 marketplace
-claude plugin marketplace add 你的用户名/student-llm-wiki
+claude plugin marketplace add IssacW228/student-llm-wiki
 # 安装插件
 claude plugin install student-llm-wiki@student-llm-wiki
 ```
@@ -195,12 +195,12 @@ claude plugin install student-llm-wiki@student-llm-wiki
 
 | 命令 | 作用 |
 |------|------|
-| `/ingest raw/COMP6713/L3.pdf` | 消化课件，去重+概念页+跨课程链接 |
+| `/ingest raw/COMPXXXX/L3.pdf` | 消化课件，去重+概念页+跨课程链接 |
 | `/lint` | 健康检查：孤立页、断链、矛盾、confidence衰减 |
-| `/review COMP9417` | 费曼复习，调整confidence，生成练习题 |
-| `/exam-prep COMP4337` | 基于弱项生成练习题 |
+| `/review COMPXXXX` | 费曼复习，调整confidence，生成练习题 |
+| `/exam-prep COMPXXXX` | 基于弱项生成练习题 |
 
-也可以直接用自然语言说"消化这个文件"或"考考我 COMP9417"——skill 会自动触发。
+也可以直接用自然语言说"消化这个文件"或"考考我 COMP9XXXX"——skill 会自动触发。
 
 ### 添加自己的课程
 
