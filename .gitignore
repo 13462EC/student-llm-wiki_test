@@ -1,9 +1,7 @@
 # Obsidian
 .obsidian/workspace.json
 .obsidian/workspace-mobile.json
-.obsidian/plugins/
 .obsidian/cache/
-.obsidian/hotkeys.json
 .trash/
 
 # OS
@@ -11,6 +9,5 @@
 Thumbs.db
 desktop.ini
 
-# Keep course folders but ignore actual PDFs (they're too large for git)
-# Uncomment the next line if you don't want PDFs in the repo:
+# Uncomment to keep PDFs out of the repo:
 # raw/**/*.pdf

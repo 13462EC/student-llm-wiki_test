@@ -2,8 +2,8 @@
 
 # 📚 Student LLM Wiki
 
-**基于 Karpathy LLM Wiki 模式的学生知识库系统**
-**A student-focused knowledge base powered by Karpathy's LLM Wiki pattern**
+**基于 Karpathy LLM Wiki 模式的学生知识库插件**
+**A student-focused knowledge base plugin powered by Karpathy's LLM Wiki pattern**
 
 [English](#english) · [中文](#中文)
 
@@ -15,137 +15,100 @@
 
 ### What is this?
 
-A ready-to-use Obsidian vault designed for university students who want AI to **compile their course materials into a persistent, interlinked knowledge wiki**. Based on [Andrej Karpathy's LLM Wiki pattern](https://gist.github.com/karpathy/442a6bf555914893e9891c11519de94f), enhanced with student-specific features and token-efficiency optimizations borrowed from [claude-obsidian](https://github.com/AgriciDaniel/claude-obsidian).
+A Claude Code / Cowork **plugin** that turns an Obsidian vault into a self-maintaining course knowledge base. You drop course slides into `raw/`; the AI compiles them into an interlinked wiki in `wiki/`. You never write wiki pages yourself — you curate sources and ask questions. Based on [Andrej Karpathy's LLM Wiki pattern](https://gist.github.com/karpathy/442a6bf555914893e9891c11519de94f).
 
-**The idea**: You drop course slides into `raw/`. AI reads them and compiles knowledge into `wiki/`. You never write wiki pages yourself — you curate sources and ask questions. Knowledge compounds over time.
+### Student-specific features
 
-### Why not just use claude-obsidian directly?
+- **Confidence decay** — Concepts auto-downgrade after 30 days without review. Weak areas surface on the dashboard.
+- **Feynman review mode** — AI quizzes you with "why" and "what if" questions to test real understanding.
+- **Exam prep generation** — Auto-generates practice questions from your weakest concepts.
+- **Cross-course connections** — Actively links concepts across different courses.
+- **Contradiction tracking** — Conflicting descriptions get flagged with `[!contradiction]` callouts.
+- **Bilingual** — All pages in Chinese-English.
+- **Domain rules** — Security: attack-defense pairs. ML: bias-variance. NLP: pretrain/finetune distinction.
 
-claude-obsidian is excellent for general knowledge work. This project adds what students specifically need:
+### Plugin architecture
 
-| Feature | claude-obsidian | Student LLM Wiki |
-|---------|----------------|-------------------|
-| Confidence decay | ❌ | ✅ Concepts auto-degrade after 30 days without review |
-| Feynman review mode | ❌ | ✅ AI quizzes you using the Feynman technique |
-| Exam prep generation | ❌ | ✅ Auto-generates practice questions from weak concepts |
-| Cross-course connections | Generic | ✅ Actively seeks links across multiple courses |
-| Contradiction tracking | `[!contradiction]` callout | ✅ Same, plus dedicated lint detection |
-| Course-organized sources | Generic `raw/` | ✅ `raw/{COURSE_CODE}/` structure |
-| Bilingual support | English | ✅ Chinese-English bilingual throughout |
-| Domain-specific rules | Generic | ✅ Per-course rules (math notation, attack-defense pairs, etc.) |
-
-### Architecture
+This is a real Claude Code plugin with modular skills — not a monolithic prompt. Each skill loads only when relevant, which keeps token usage low.
 
 ```
-vault/
-├── raw/                    ← Layer 1: Immutable sources (read-only)
-│   ├── COMP4337/           ←   Course slides, papers, handouts
-│   ├── COMP6713/
-│   ├── COMP9417/
-│   └── .manifest.json      ←   Hash-based dedup tracker
-├── wiki/                   ← Layer 2: AI-maintained knowledge pages
-│   ├── hot.md              ←   Context cache (≤500 words, read first)
-│   ├── index.md            ←   Master catalog
-│   ├── overview.md         ←   Cross-course synthesis
-│   ├── log.md              ←   Append-only operation log
-│   ├── courses/            ←   Course MOC pages
-│   ├── concepts/           ←   Concept pages (the core)
-│   ├── sources/            ←   Source summaries
-│   └── exam-prep/          ←   Auto-generated practice questions
-├── SCHEMA.md               ← Layer 3: Operating rules for AI
-├── COWORK-INSTRUCTIONS.md  ← Compact version for Cowork Instructions field
-└── Home.md                 ← Dashboard with Dataview queries
+student-llm-wiki/
+├── .claude-plugin/
+│   ├── plugin.json          ← Plugin manifest
+│   └── marketplace.json     ← Distribution config
+├── skills/                  ← Modular skills (load on demand)
+│   ├── wiki-core/           ←   Architecture + token rules (loads first)
+│   ├── wiki-ingest/         ←   INGEST: digest a source
+│   ├── wiki-lint/           ←   LINT: health check + confidence decay
+│   ├── wiki-review/         ←   REVIEW: Feynman quiz
+│   └── exam-prep/           ←   EXAM-PREP: generate questions
+├── commands/                ← Slash commands
+│   ├── ingest.md            ←   /ingest
+│   ├── lint.md              ←   /lint
+│   ├── review.md            ←   /review
+│   └── exam-prep.md         ←   /exam-prep
+├── raw/                     ← Layer 1: your course slides (read-only)
+│   ├── COMP4337/  COMP6713/  COMP9417/  INFS5730/  misc/
+│   └── .manifest.json       ←   hash dedup tracker
+├── wiki/                    ← Layer 2: AI-maintained pages
+│   ├── hot.md               ←   context cache (read first)
+│   ├── index.md  overview.md  log.md
+│   ├── courses/  concepts/  sources/  exam-prep/
+├── SCHEMA.md                ← Human-readable design reference
+└── Home.md                  ← Obsidian dashboard
 ```
+
+### Why split into skills?
+
+A single SCHEMA file was loaded fully into context every operation (~3000 tokens). Splitting into skills means `/ingest` loads only ingest rules, `/lint` loads only lint rules. Combined with the `hot.md` cache (≤500 words read at session start) and manifest dedup (skip unchanged files), this cuts token usage dramatically.
 
 ### Token efficiency
 
-Previous versions burned through usage quotas fast. v3 borrows three mechanisms from claude-obsidian:
-
-- **Hot cache** (`wiki/hot.md`): AI reads ≤500 words at session start instead of the full SCHEMA + index + overview. ~80% reduction in startup overhead.
-- **Manifest dedup** (`raw/.manifest.json`): Files are hashed before ingest. Same hash = skip. No wasted tokens on re-processing.
-- **Token budget rules** (top priority in SCHEMA): Max 3-5 existing pages read per ingest. Surgical edits instead of full rewrites. Batch meta-file updates (index/hot/log updated once at the end, not per-source).
+- **Hot cache** (`wiki/hot.md`) — AI reads ≤500 words at start instead of full rules.
+- **Manifest dedup** (`raw/.manifest.json`) — files hashed before ingest; same hash = skip.
+- **Token budget rules** (in `wiki-core`) — max 3–5 pages read per ingest, surgical edits, batch meta updates.
 
 ### Quick start
 
-#### Option A: Claude Desktop (Cowork)
+#### Option A: Install as a plugin (Claude Code / Cowork)
 
-1. Download and unzip this repo
-2. Open the `vault/` folder as an Obsidian vault. Install the [Dataview](https://github.com/blacksmithgu/obsidian-dataview) plugin.
-3. In Claude Desktop → Cowork → Create project → point to the same `vault/` folder
-4. Paste the contents of `COWORK-INSTRUCTIONS.md` into the Instructions field
-5. Drop your course PDFs into `raw/{COURSE_CODE}/`
-6. Tell Cowork:
-
-```
-Read SCHEMA.md, then ingest raw/COMP6713/Lecture3-Attention.pdf
+```bash
+# Add this repo as a marketplace
+claude plugin marketplace add YOUR_USERNAME/student-llm-wiki
+# Install the plugin
+claude plugin install student-llm-wiki@student-llm-wiki
 ```
 
-#### Option B: Claude Code (terminal)
+Then open your vault folder, drop slides into `raw/`, and use the slash commands.
 
-1. Clone this repo and `cd vault/`
-2. Open it as an Obsidian vault
-3. Start Claude Code in the same directory
-4. Claude will read `SCHEMA.md` automatically
+#### Option B: Use directly without installing
 
-#### Option C: Claudian (Obsidian plugin)
-
-1. Open the vault in Obsidian with [Claudian](https://github.com/Enigmora/claudian) installed
-2. Tell Claudian to read `SCHEMA.md` first
-3. Use the same commands
+1. Download/clone this repo. Open the folder as an Obsidian vault. Install the [Dataview](https://github.com/blacksmithgu/obsidian-dataview) plugin.
+2. Open the folder in Claude Code, or point a Cowork project at it.
+3. The AI reads `skills/wiki-core/SKILL.md` automatically when you start working.
+4. Drop course PDFs into `raw/{COURSE_CODE}/` and run a command.
 
 ### Commands
 
 | Command | What it does |
 |---------|-------------|
-| `ingest raw/COMP6713/L3.pdf` | Digest a source file. Creates source page + concept pages. Auto-deduplicates. |
-| `lint` | Health check: orphan pages, broken links, contradictions, confidence decay (>30 days → auto-downgrade) |
-| `review COMP9417` | Feynman review mode: AI quizzes you, adjusts confidence, generates practice questions for weak concepts |
-| `exam-prep COMP4337` | Generate practice questions from all low/medium confidence concepts in a course |
+| `/ingest raw/COMP6713/L3.pdf` | Digest a source. Dedup + concept pages + cross-course links. |
+| `/lint` | Health check: orphans, broken links, contradictions, confidence decay. |
+| `/review COMP9417` | Feynman quiz mode. Adjusts confidence, generates practice questions. |
+| `/exam-prep COMP4337` | Generate practice questions from weak concepts. |
 
-### Concept page format
+You can also just say "ingest this file" or "quiz me on COMP9417" in natural language — the skills trigger automatically.
 
-Every concept page follows this structure:
+### Adding your own courses
 
-```markdown
----
-tags: [concept, nlp]
-courses: [COMP6713]
-confidence: medium
-last_reviewed: 2026-06-01
----
-# 注意力机制 Attention Mechanism
-
-## 直觉 Intuition
-(Feynman-style explanation for a smart outsider)
-
-## 详细解释 Detailed Explanation
-(Technical details, formulas, algorithms)
-
-## 为什么重要 Why It Matters
-
-## 连接 Connections
-- [[Transformer-Architecture]] — Attention is the core component
-- [[Word-Embeddings]] — Attention operates on vector representations
-
-## 来源 Sources
-- [[L3-Attention]]
-
-## 待解决 Open Questions
-- ?
-```
-
-### Customization
-
-**Adding courses**: Create a new folder under `raw/` and a new overview page under `wiki/courses/`. Update `SCHEMA.md` domain rules if the course has special requirements.
-
-**Changing language**: Modify the language rules section in `SCHEMA.md`. The system supports any bilingual combination.
-
-**Adjusting confidence decay**: Change the 30-day threshold in the LINT workflow section of `SCHEMA.md`.
+1. Create a folder under `raw/` (e.g. `raw/MATH1131/`).
+2. Create `wiki/courses/MATH1131-overview.md`.
+3. If the course has special needs, add a domain rule in `skills/wiki-core/SKILL.md`.
 
 ### Credits
 
 - [Andrej Karpathy's LLM Wiki](https://gist.github.com/karpathy/442a6bf555914893e9891c11519de94f) — the original pattern
-- [claude-obsidian](https://github.com/AgriciDaniel/claude-obsidian) — hot cache, manifest dedup, and token budget concepts
+- [claude-obsidian](https://github.com/AgriciDaniel/claude-obsidian) — hot cache, manifest dedup, skill decomposition
 - [Obsidian](https://obsidian.md) — the knowledge platform
 
 ### License
@@ -158,49 +121,97 @@ MIT
 
 ### 这是什么？
 
-一个面向大学生的即用型 Obsidian 知识库模板，让 AI 将你的**课件自动编译成持久化、互相链接的知识 wiki**。基于 [Karpathy 的 LLM Wiki 模式](https://gist.github.com/karpathy/442a6bf555914893e9891c11519de94f)，融合了 [claude-obsidian](https://github.com/AgriciDaniel/claude-obsidian) 的 token 优化机制，并新增学生专属功能。
-
-**核心理念**：你把课件 PDF 丢进 `raw/`，AI 读取并编译知识到 `wiki/`。你不需要自己写任何 wiki 页面——你只负责选材料和提问。知识会像复利一样随时间增长。
+一个 Claude Code / Cowork **插件**，把 Obsidian 知识库变成一个自维护的课程知识系统。你把课件丢进 `raw/`，AI 自动编译成互相链接的 wiki 到 `wiki/`。你不需要写任何 wiki 页面——只负责选材料和提问。基于 [Karpathy 的 LLM Wiki 模式](https://gist.github.com/karpathy/442a6bf555914893e9891c11519de94f)。
 
 ### 学生专属功能
 
-- **Confidence 衰减**：概念超过30天未复习自动降级，薄弱环节自动浮现
-- **费曼复习模式**：AI 用费曼技巧向你提问，测试你是否真正理解
-- **自动出题**：基于 confidence:low 的概念生成练习题
-- **跨课程连接**：主动寻找不同课程之间的概念关联（这是最有价值的）
-- **矛盾标注**：不同资料对同一概念的不同描述会被标记
-- **中英双语**：所有 wiki 页面双语输出
-- **域特定规则**：安全课标注攻防配对+lab验证，ML课标注bias-variance，NLP课区分预训练/微调
+- **Confidence 衰减** — 概念超过30天未复习自动降级，薄弱环节自动浮现
+- **费曼复习模式** — AI 用"为什么""如果...会怎样"提问，测试真正理解
+- **自动出题** — 根据最薄弱的概念生成练习题
+- **跨课程连接** — 主动链接不同课程的概念
+- **矛盾标注** — 冲突的描述用 `[!contradiction]` 标记
+- **中英双语** — 所有页面双语
+- **域规则** — 安全:攻防配对 | ML:bias-variance | NLP:预训练/微调区分
 
-### Token 节省机制
+### 插件架构
 
-上一版处理三周PPT就用完了5小时额度。v3 通过三个机制解决：
+这是一个真正的 Claude Code 插件，采用模块化 skill——不是单体提示词。每个 skill 只在相关时加载，大幅降低 token 消耗。
 
-- **Hot cache**（`wiki/hot.md`）：每次 session 只读≤500词缓存，不再读完整 SCHEMA
-- **Manifest 去重**（`raw/.manifest.json`）：相同文件不重复处理
-- **Token 预算规则**：每次最多读3-5个已有页面，局部编辑不全文重写，批量操作只在最后更新一次 meta 文件
+```
+student-llm-wiki/
+├── .claude-plugin/
+│   ├── plugin.json          ← 插件清单
+│   └── marketplace.json     ← 分发配置
+├── skills/                  ← 模块化技能（按需加载）
+│   ├── wiki-core/           ←   架构 + token规则（最先加载）
+│   ├── wiki-ingest/         ←   消化课件
+│   ├── wiki-lint/           ←   健康检查 + confidence衰减
+│   ├── wiki-review/         ←   费曼复习
+│   └── exam-prep/           ←   出题
+├── commands/                ← 斜杠命令
+│   ├── ingest.md  lint.md  review.md  exam-prep.md
+├── raw/                     ← 第一层：课件（只读）
+│   ├── COMP4337/  COMP6713/  COMP9417/  INFS5730/  misc/
+│   └── .manifest.json       ←   hash去重追踪
+├── wiki/                    ← 第二层：AI维护的页面
+│   ├── hot.md               ←   上下文缓存（首读）
+│   ├── index.md  overview.md  log.md
+│   ├── courses/  concepts/  sources/  exam-prep/
+├── SCHEMA.md                ← 人类可读的设计参考
+└── Home.md                  ← Obsidian 仪表盘
+```
+
+### 为什么拆成 skill？
+
+单体 SCHEMA 每次操作都被完整读入上下文（约3000 tokens）。拆成 skill 后，`/ingest` 只加载 ingest 规则，`/lint` 只加载 lint 规则。配合 `hot.md` 缓存（每次开始只读≤500词）和 manifest 去重（跳过未变文件），token 消耗大幅下降。
+
+### Token 节省说明
+
+- **Hot cache**（`wiki/hot.md`）：每次只读≤500词缓存，不读完整规则
+- **Manifest 去重**（`raw/.manifest.json`）：文件 hash 校验，相同则跳过
+- **Token 预算规则**（在 `wiki-core`）：每次最多读3-5页，局部编辑，批量更新meta
 
 ### 快速开始
 
-1. 下载解压，用 Obsidian 打开 `vault/` 文件夹，安装 Dataview 插件
-2. 在 Claude Desktop 的 Cowork 中创建项目，指向同一文件夹
-3. 把 `COWORK-INSTRUCTIONS.md` 的内容粘贴到 Instructions 框
-4. 把课件放进 `raw/{课程代码}/`
-5. 对 Cowork 说：`读 SCHEMA.md，然后 ingest raw/COMP6713/Lecture3.pdf`
+#### 方式一：作为插件安装（Claude Code / Cowork）
+
+```bash
+# 把本仓库添加为 marketplace
+claude plugin marketplace add 你的用户名/student-llm-wiki
+# 安装插件
+claude plugin install student-llm-wiki@student-llm-wiki
+```
+
+然后打开你的知识库文件夹，把课件放进 `raw/`，使用斜杠命令。
+
+#### 方式二：不安装直接用
+
+1. 下载/克隆本仓库，用 Obsidian 打开作为知识库，安装 [Dataview](https://github.com/blacksmithgu/obsidian-dataview) 插件
+2. 用 Claude Code 打开该文件夹，或让 Cowork 项目指向它
+3. 开始工作时 AI 会自动读取 `skills/wiki-core/SKILL.md`
+4. 把课件 PDF 放进 `raw/{课程代码}/`，运行命令
 
 ### 命令
 
 | 命令 | 作用 |
 |------|------|
-| `ingest raw/COMP6713/L3.pdf` | 消化课件（自动去重） |
-| `lint` | 健康检查 + confidence 衰减检测 |
-| `review COMP9417` | 费曼复习模式 |
-| `exam-prep COMP4337` | 基于弱项自动出题 |
+| `/ingest raw/COMP6713/L3.pdf` | 消化课件，去重+概念页+跨课程链接 |
+| `/lint` | 健康检查：孤立页、断链、矛盾、confidence衰减 |
+| `/review COMP9417` | 费曼复习，调整confidence，生成练习题 |
+| `/exam-prep COMP4337` | 基于弱项生成练习题 |
+
+也可以直接用自然语言说"消化这个文件"或"考考我 COMP9417"——skill 会自动触发。
+
+### 添加自己的课程
+
+1. 在 `raw/` 下创建文件夹（如 `raw/MATH1131/`）
+2. 创建 `wiki/courses/MATH1131-overview.md`
+3. 如有特殊需求，在 `skills/wiki-core/SKILL.md` 加一条域规则
 
 ### 致谢
 
 - [Karpathy LLM Wiki](https://gist.github.com/karpathy/442a6bf555914893e9891c11519de94f) — 原始模式
-- [claude-obsidian](https://github.com/AgriciDaniel/claude-obsidian) — hot cache、manifest 去重、token 预算概念
+- [claude-obsidian](https://github.com/AgriciDaniel/claude-obsidian) — hot cache、manifest去重、skill拆分
 - [Obsidian](https://obsidian.md) — 知识平台
 
 ### 许可证

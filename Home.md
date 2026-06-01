@@ -1,18 +1,18 @@
 ---
 tags: [home]
 ---
-# 🏠 知识库 v3 — Student LLM Wiki
+# 🏠 知识库 v3 — Student LLM Wiki (插件版)
 
-> Obsidian浏览，Cowork编译，课件是燃料，wiki是产出。
+> Obsidian浏览，Claude编译，课件是燃料，wiki是产出。
 
-## ⚡ 指令 Commands
+## ⚡ 命令 Commands
 
-| 说 | 做 |
+| 命令 | 作用 |
 |---|---|
-| `ingest raw/COMP6713/L3.pdf` | 消化课件(自动去重) |
-| `lint` | 健康检查+confidence衰减 |
-| `review COMP9417` | 费曼复习 |
-| `exam-prep COMP4337` | 弱项出题 |
+| `/ingest raw/COMP6713/L3.pdf` | 消化课件(自动去重) |
+| `/lint` | 健康检查+confidence衰减 |
+| `/review COMP9417` | 费曼复习 |
+| `/exam-prep COMP4337` | 弱项出题 |
 
 ## 📚 课程
 
