@@ -200,7 +200,7 @@ claude plugin install student-llm-wiki@student-llm-wiki
 | `/review COMPXXXX` | 费曼复习，调整confidence，生成练习题 |
 | `/exam-prep COMPXXXX` | 基于弱项生成练习题 |
 
-也可以直接用自然语言说"消化这个文件"或"考考我 COMP9XXXX"——skill 会自动触发。
+也可以直接用自然语言说"消化这个文件"或"考考我 COMPXXXX"——skill 会自动触发。
 
 ### 添加自己的课程
 
