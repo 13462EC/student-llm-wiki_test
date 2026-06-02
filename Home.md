@@ -1,7 +1,7 @@
 ---
 tags: [home]
 ---
-# 🏠 知识库 v3 — Student LLM Wiki (插件版)
+# 🏠 知识库 — Student LLM Wiki
 
 > Obsidian浏览，Claude编译，课件是燃料，wiki是产出。
 
@@ -9,15 +9,20 @@ tags: [home]
 
 | 命令 | 作用 |
 |---|---|
-| `/ingest raw/COMP6713/L3.pdf` | 消化课件(自动去重) |
+| `/ingest raw/COMPXXXX/L1.pdf` | 消化课件(自动去重) |
 | `/lint` | 健康检查+confidence衰减 |
-| `/review COMP9417` | 费曼复习 |
-| `/exam-prep COMP4337` | 弱项出题 |
+| `/review COMPXXXX` | 费曼复习 |
+| `/exam-prep COMPXXXX` | 弱项出题 |
 
-## 📚 课程
+> 将你的课件 PDF 放入 `raw/{课程代码}/`，然后运行 `/ingest`，课程总览页会自动生成。
 
-- [[COMP4337-overview]]  [[COMP6713-overview]]
-- [[COMP9417-overview]]  [[INFS5730-overview]]
+## 📚 课程 Courses
+
+```dataview
+TABLE file.mtime AS 最近更新
+FROM "wiki/courses"
+SORT file.mtime DESC
+```
 
 ## 🔴 薄弱概念
 
