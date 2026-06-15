@@ -15,6 +15,7 @@ Read the corresponding rules file before each operation (load on demand):
 | lint / 检查wiki | `skills/wiki-lint/SKILL.md` |
 | review / 复习 | `skills/wiki-review/SKILL.md` |
 | exam-prep / 出题 | `skills/exam-prep/SKILL.md` |
+| diagram / 画图配图 | `skills/wiki-diagram/SKILL.md` |
 
 ## Token预算规则（最高优先级）
 
@@ -45,3 +46,4 @@ raw/.manifest.json  ← 去重追踪 / Dedup tracker
 - `lint` — 健康检查 + confidence衰减
 - `review COMP9417` — 费曼复习
 - `exam-prep COMP4337` — 弱项出题
+- `diagram Attention-Mechanism` — 为概念页配 Mermaid 图
