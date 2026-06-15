@@ -4,7 +4,7 @@ updated: 2026-06-01
 ---
 # 大图景 Overview
 
-UNSW研究生四门课：网络安全(COMP4337)、NLP(COMP6713)、ML(COMP9417)、社交媒体分析(INFS5730)。
+*等待 ingest 后自动填充课程列表 / Course list auto-populated after ingest*
 
 ## 跨课程连接 Cross-Course Connections
 *等待积累 / Awaiting accumulation*
