@@ -19,7 +19,7 @@ Turn a source file in `raw/` into wiki pages.
 7. **创建/更新概念页**（最多3-5页，不贪多）:
    - 新概念 → 新建 `wiki/concepts/{Name}.md`，confidence默认 low
    - 已有概念 → 局部编辑，补充内容，更新 `updated` 日期
-8. **图表处理**: 若源含重要图表，文字描述其内容，标注是否建议 Excalidraw 重绘
+8. **图表处理**: 若源含重要图表，文字描述其内容；若该概念涉及流程/架构/时序/分类等适合可视化的内容，按 wiki-diagram skill 判断标准用 Mermaid 配图
 9. **跨课程连接**: 检查新概念是否在其他课程出现过。若是，在两个概念页都加 `[[链接]]`
 10. **矛盾检测**: 若新内容与已有页面冲突，在概念页用 `> [!contradiction]` callout 标注
 11. **最后一次性更新**: `index.md` + `hot.md` + `log.md` + `.manifest.json`（不要每步都更新）

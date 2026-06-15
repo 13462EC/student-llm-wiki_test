@@ -22,36 +22,56 @@ wiki/            ← Layer 2: 你维护的知识 Knowledge you maintain
   sources/       ←   来源页
   exam-prep/     ←   练习题
 raw/.manifest.json  ← 去重追踪 Dedup tracker
+(这些skill是 Layer 3 — 操作规则)
 ```
 
-## Token预算规则（最高优先级）
+## Token预算规则（最高优先级 TOP PRIORITY）
 
-1. 每次session首先只读 `wiki/hot.md`（≤500词）
-2. 需要更多上下文才读 `wiki/index.md`
-3. 每次ingest最多读3-5个已有页面
-4. 局部编辑，不全文重写
-5. wiki页面100-300行，超300行拆分
-6. 批量操作时 index/hot/log 最后更新一次
+违反这些规则会浪费用户额度。它们高于所有其他规则。
+Violating these wastes the user's quota. They override all other rules.
+
+1. **每次session首先只读 `wiki/hot.md`**（≤500词）。若含所需上下文，不再读其他页
+2. **需要更多上下文才读 `wiki/index.md`**，从中定位页面
+3. **每次ingest最多读3-5个已有页面**。超过5个=读得太广
+4. **局部编辑，不全文重写**。改一个字段不要重写整页
+5. **wiki页面100-300行**。超300行拆分
+6. **批量操作时 index/hot/log 最后更新一次**，不是每源更新一次
 
 ## 语言 Language
 
-中英双语。标题"中文 English"。[[链接]] 用英文+连字符。
+中英双语。标题"中文 English"。`[[链接]]` 用英文+连字符（如 `[[Gradient-Descent]]`）。
 
-## 概念页格式
+## 概念页格式 Concept Page Format
 
-文件: wiki/concepts/{English-Name}.md
-frontmatter: tags, courses, confidence(low|medium|high), last_reviewed
-章节: 直觉(费曼)→详解→为什么重要→连接(含跨课程)→来源→待解决
+文件: `wiki/concepts/{English-Name}.md`
+```yaml
+---
+tags: [concept, {domain}]
+courses: [COMP6713]
+confidence: low|medium|high
+last_reviewed: YYYY-MM-DD
+---
+```
+章节: 直觉 Intuition（费曼风格）→ 详细解释 Detailed → [图解 Diagram，可选，见 wiki-diagram skill] → 为什么重要 Why → 连接 Connections（含跨课程）→ 来源 Sources → 待解决 Open Questions
 
-## 域规则
+## 来源页格式 Source Page
 
-- 数学: LaTeX + 直觉解释
+文件: `wiki/sources/{name}.md`
+关键要点(3-5) → 图表描述(标注是否建议用 Mermaid 重绘，见 wiki-diagram skill) → 新概念列表 → 更新了哪些页面
+
+## Hot Cache 内容
+
+每次操作完更新 `wiki/hot.md`（≤500词）：最近3个来源 / 最近概念 / 当前薄弱概念 / 待办
+
+## 域规则 Domain Rules
+
+- 数学: LaTeX + 直觉解释每个符号
 - 安全 COMP4337: 攻防配对，lab验证标 ✅
-- ML COMP9417: 适用场景 + 对比 + bias-variance
-- NLP COMP6713: 架构描述 + 预训练/微调区分
-- 分析 INFS5730: SAS VTA步骤
+- ML COMP9417: 适用场景 + 对比 + bias-variance特性
+- NLP COMP6713: 架构描述 + 预训练/微调/推理区分
+- 分析 INFS5730: SAS VTA步骤 + 数据类型
 
-## 绝对规则
+## 绝对规则 Hard Rules
 
 1. 永不改 raw/
 2. 一概念一页，费曼风格
