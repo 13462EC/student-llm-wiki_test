@@ -54,6 +54,11 @@ last_reviewed: YYYY-MM-DD
 ```
 章节: 直觉 Intuition（费曼风格）→ 详细解释 Detailed → [图解 Diagram，可选，见 wiki-diagram skill] → 为什么重要 Why → 连接 Connections（含跨课程）→ 来源 Sources → 待解决 Open Questions
 
+## 课程总览页格式 Course Overview Format
+
+文件: `wiki/courses/{COURSE}-overview.md`，frontmatter: `tags: [course-overview, {course-code}]` + `course: {COURSE-CODE}` + `updated: YYYY-MM-DD`
+章节: 综述 Summary（一句话）→ 概念图谱 Concept Map（`[[链接]]` 列表）→ 薄弱环节（Dataview: confidence=low）→ 来源（Dataview: sources by course tag）
+
 ## 来源页格式 Source Page
 
 文件: `wiki/sources/{name}.md`

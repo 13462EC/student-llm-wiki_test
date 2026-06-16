@@ -16,13 +16,21 @@ Turn a source file in `raw/` into wiki pages.
 4. **读源文件**，提炼3-5个关键要点
 5. **与用户讨论确认**（不跳过这步）
 6. **创建来源页** `wiki/sources/{name}.md`
+6.5. **创建/更新课程总览页** `wiki/courses/{COURSE}-overview.md`:
+   - 不存在则新建（用下方"课程总览页格式"）
+   - 已有则在"概念图谱"章节追加本次新概念的 `[[链接]]`
 7. **创建/更新概念页**（最多3-5页，不贪多）:
    - 新概念 → 新建 `wiki/concepts/{Name}.md`，confidence默认 low
    - 已有概念 → 局部编辑，补充内容，更新 `updated` 日期
 8. **图表处理**: 若源含重要图表，文字描述其内容；若该概念涉及流程/架构/时序/分类等适合可视化的内容，按 wiki-diagram skill 判断标准用 Mermaid 配图
-9. **跨课程连接**: 检查新概念是否在其他课程出现过。若是，在两个概念页都加 `[[链接]]`
-10. **矛盾检测**: 若新内容与已有页面冲突，在概念页用 `> [!contradiction]` callout 标注
-11. **最后一次性更新**: `index.md` + `hot.md` + `log.md` + `.manifest.json`（不要每步都更新）
+9. **跨课程连接**: 检查新概念是否在其他课程出现过。若是：
+   - 在两个概念页都加 `[[链接]]`
+   - 在 `wiki/connections-log.md` 追加一条记录（用下方"连接日志格式"）
+10. **矛盾检测**: 若新内容与已有页面冲突：
+    - 在概念页用 `> [!contradiction]` callout 标注
+    - 在 `wiki/contradictions.md` 追加一条记录（用下方"矛盾记录格式"）
+11. **最后一次性更新**: `index.md` + `hot.md` + `log.md` + `overview.md` + `.manifest.json`（不要每步都更新）
+    - `overview.md` 更新内容：有新课程则加入课程列表，有新连接则更新"跨课程连接"摘要，有新矛盾则更新"矛盾与张力"摘要
 
 ## Manifest 格式
 
@@ -46,3 +54,56 @@ Turn a source file in `raw/` into wiki pages.
 ## 完成报告 Report
 
 "处理了 N 个来源。创建 X 页，更新 Y 页。发现的跨课程连接: ..."
+
+## 课程总览页格式 Course Overview Format
+
+文件: `wiki/courses/{COURSE}-overview.md`
+```markdown
+---
+tags: [course-overview, {course-code}]
+course: {COURSE-CODE}
+updated: YYYY-MM-DD
+---
+# {COURSE-CODE} — {课程名 Course Name}
+
+## 综述 Summary
+{一句话描述课程主题}
+
+## 概念图谱 Concept Map
+[[Concept-A]] · [[Concept-B]] · ...
+
+## 薄弱环节 Weak Areas
+\`\`\`dataview
+TABLE confidence, last_reviewed FROM "wiki/concepts"
+WHERE contains(courses, "{COURSE-CODE}") AND confidence = "low"
+SORT last_reviewed ASC
+\`\`\`
+
+## 来源 Sources
+\`\`\`dataview
+LIST FROM "wiki/sources" WHERE contains(tags, "{course-code}") SORT file.ctime DESC
+\`\`\`
+```
+
+## 连接日志格式 Connection Log Format
+
+追加到 `wiki/connections-log.md`：
+```markdown
+## {YYYY-MM-DD} — {概念名}
+**课程A**: {COURSE-A} → [[Concept-Page-A]]
+**课程B**: {COURSE-B} → [[Concept-Page-B]]
+**连接本质**: 用一句话描述为什么这两个概念有关
+**深度**: 表面相似 / 共享数学基础 / 同一思想的不同应用
+```
+
+## 矛盾记录格式 Contradiction Format
+
+追加到 `wiki/contradictions.md`：
+```markdown
+## {YYYY-MM-DD} — {矛盾标题}
+**页面A**: [[page-a]] 说 "..."
+**页面B**: [[page-b]] 说 "..."
+**张力**: 描述矛盾的本质
+**状态**: 未解决
+**解决方案**: （待填）
+```

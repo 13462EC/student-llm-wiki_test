@@ -12,7 +12,7 @@ Health-check the knowledge base.
 
 1. **孤立页 Orphans**: 没有任何 `[[链接]]` 指向的概念页
 2. **断链 Broken links**: `[[链接]]` 指向不存在的页面
-3. **矛盾 Contradictions**: 不同页面对同一概念的冲突描述。汇总到 overview.md 的矛盾部分
+3. **矛盾 Contradictions**: 不同页面对同一概念的冲突描述。同时写入 `wiki/contradictions.md`（用 wiki-ingest 中的矛盾记录格式）并更新 `overview.md` 的矛盾摘要
 4. **陈旧内容 Stale**: confidence:low 且长期未更新的页面
 5. **Confidence 衰减 Decay**:
    - 若概念页 `last_reviewed` 距今 >30天，且期间未被新页面引用 → confidence 降一级（high→medium→low）
@@ -24,7 +24,11 @@ Health-check the knowledge base.
 1. 读 `wiki/index.md` 获取所有页面列表
 2. 按需读取页面检查（遵守token预算，分批检查）
 3. 报告发现，**询问用户要修复哪些**（不要自动全改）
-4. 修复后，批量更新低优先级页面（glossary/overview）——平时不更新这些
+4. 修复后，批量更新：
+   - `wiki/contradictions.md`（新发现的矛盾）
+   - `wiki/connections-log.md`（补录缺失的跨课连接，用 wiki-ingest 中的连接日志格式）
+   - `wiki/overview.md`（更新矛盾摘要和连接摘要）
+   - `wiki/log.md`（追加本次 lint 操作记录）
 
 ## 报告格式 Report
 
