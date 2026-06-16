@@ -28,7 +28,7 @@ Health-check the knowledge base.
    - `wiki/contradictions.md`（新发现的矛盾）
    - `wiki/connections-log.md`（补录缺失的跨课连接，用 wiki-ingest 中的连接日志格式）
    - `wiki/overview.md`（更新矛盾摘要和连接摘要）
-   - `wiki/log.md`（追加本次 lint 操作记录）
+   - `wiki/log.md`（追加格式: `## {YYYY-MM-DD} — lint: 孤立N 断链N 衰减N 矛盾N 补连N`）
 
 ## 报告格式 Report
 

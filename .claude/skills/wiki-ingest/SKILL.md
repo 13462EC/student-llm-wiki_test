@@ -20,8 +20,8 @@ Turn a source file in `raw/` into wiki pages.
    - 不存在则新建（用下方"课程总览页格式"）
    - 已有则在"概念图谱"章节追加本次新概念的 `[[链接]]`
 7. **创建/更新概念页**（最多3-5页，不贪多）:
-   - 新概念 → 新建 `wiki/concepts/{Name}.md`，confidence默认 low
-   - 已有概念 → 局部编辑，补充内容，更新 `updated` 日期
+   - 新概念 → 新建 `wiki/concepts/{Name}.md`，confidence默认 low，**设置 `created_at` 为今天日期**
+   - 已有概念 → 局部编辑，补充内容，更新 `last_reviewed` 日期（不改 `created_at`）
 8. **图表处理**: 若源含重要图表，文字描述其内容；若该概念涉及流程/架构/时序/分类等适合可视化的内容，按 wiki-diagram skill 判断标准用 Mermaid 配图
 9. **跨课程连接**: 检查新概念是否在其他课程出现过。若是：
    - 在两个概念页都加 `[[链接]]`
@@ -31,6 +31,8 @@ Turn a source file in `raw/` into wiki pages.
     - 在 `wiki/contradictions.md` 追加一条记录（用下方"矛盾记录格式"）
 11. **最后一次性更新**: `index.md` + `hot.md` + `log.md` + `overview.md` + `.manifest.json`（不要每步都更新）
     - `overview.md` 更新内容：有新课程则加入课程列表，有新连接则更新"跨课程连接"摘要，有新矛盾则更新"矛盾与张力"摘要
+    - `wiki/glossary.md` 将本次新建概念追加到术语表（英文、中文、领域、`[[页面链接]]`）
+    - `log.md` 追加一条结构化日志记录（用下方"日志格式"）
 
 ## Manifest 格式
 
@@ -39,9 +41,13 @@ Turn a source file in `raw/` into wiki pages.
   "sources": {
     "raw/COMP6713/L3.pdf": {
       "hash": "abc123",
+      "course": "COMP6713",
       "ingested_at": "2026-06-01",
       "pages_created": ["wiki/sources/L3.md"],
-      "pages_updated": ["wiki/concepts/Attention-Mechanism.md"]
+      "concepts_created": ["Attention-Mechanism"],
+      "concepts_updated": ["Transformer"],
+      "connections_found": 2,
+      "contradictions_found": 0
     }
   }
 }
@@ -94,6 +100,17 @@ LIST FROM "wiki/sources" WHERE contains(tags, "{course-code}") SORT file.ctime D
 **课程B**: {COURSE-B} → [[Concept-Page-B]]
 **连接本质**: 用一句话描述为什么这两个概念有关
 **深度**: 表面相似 / 共享数学基础 / 同一思想的不同应用
+```
+
+## 日志格式 Log Entry Format
+
+追加到 `wiki/log.md`：
+```markdown
+## {YYYY-MM-DD} — ingest: {source-file}
+- 创建概念: [[Concept-A]], [[Concept-B]]
+- 更新概念: [[Concept-C]]
+- 跨课连接: N条（见 connections-log.md）
+- 矛盾: N条（见 contradictions.md）
 ```
 
 ## 矛盾记录格式 Contradiction Format
