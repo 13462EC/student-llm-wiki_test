@@ -137,10 +137,11 @@ cd student-llm-wiki
 
 | 命令 | 作用 |
 |---|---|
-| `ingest raw/XXXX/L1.pdf` | 导入课件，自动生成笔记 |
-| `lint` | 检查笔记健康度：断链、孤立页、过期概念 |
+| `ingest raw/XXXX/L1.pdf` | 导入课件，自动生成笔记、课程总览、跨课连接记录 |
+| `lint` | 检查笔记健康度：断链、孤立页、过期概念、缺失总览、术语表补全 |
 | `review XXXX` | 费曼复习模式：AI 提问，你来回答 |
 | `exam-prep XXXX` | 根据薄弱概念自动出练习题 |
+| `diagram ConceptName` | 为某个概念页添加 Mermaid 图解（流程图/架构图/时序图等） |
 
 也可以用自然语言，比如「帮我复习这门课」或「把这个文件导入知识库」。
 
@@ -162,10 +163,16 @@ student-llm-wiki/
 ├── raw/              ← 放课件（只读，AI 不会修改这里）
 │   └── XXXX/         ← 按课程分文件夹
 ├── wiki/             ← AI 生成的笔记（自动维护）
-│   ├── concepts/     ← 概念页
-│   ├── courses/      ← 课程总览
-│   ├── sources/      ← 课件摘要
-│   └── exam-prep/    ← 练习题
+│   ├── concepts/         ← 概念页（每概念一页，含图解）
+│   ├── courses/          ← 课程总览（ingest 时自动创建）
+│   ├── sources/          ← 课件摘要
+│   ├── exam-prep/        ← 练习题
+│   ├── connections-log.md  ← 跨课程连接发现记录
+│   ├── contradictions.md   ← 矛盾与张力追踪
+│   ├── glossary.md         ← 中英术语表（自动填充）
+│   ├── overview.md         ← 跨课程综述（自动更新）
+│   ├── index.md            ← 总目录
+│   └── hot.md              ← AI 上下文缓存（每次 session 首读）
 ├── Home.md           ← Obsidian 首页仪表盘
 │
 │   以下为 AI 工具配置文件，无需修改：
@@ -316,10 +323,11 @@ Open Obsidian → "Open folder as vault" → select the `student-llm-wiki` folde
 
 | Command | What it does |
 |---|---|
-| `ingest raw/XXXX/L1.pdf` | Import a slide deck and generate notes |
-| `lint` | Check wiki health: broken links, orphan pages, stale concepts |
+| `ingest raw/XXXX/L1.pdf` | Import a slide deck — generates notes, course overview, and cross-course link records |
+| `lint` | Check wiki health: broken links, orphan pages, stale concepts, missing overviews, glossary gaps |
 | `review XXXX` | Feynman review mode: AI quizzes you |
 | `exam-prep XXXX` | Auto-generate practice questions from weak concepts |
+| `diagram ConceptName` | Add a Mermaid diagram to a concept page (flowchart / architecture / sequence / etc.) |
 
 You can also use plain English: "quiz me on this course" or "import this file into the wiki".
 
@@ -341,10 +349,16 @@ student-llm-wiki/
 ├── raw/              ← Your slides (read-only — AI never modifies this)
 │   └── XXXX/         ← One folder per course
 ├── wiki/             ← AI-generated notes (auto-maintained)
-│   ├── concepts/     ← Concept pages
-│   ├── courses/      ← Course overviews
-│   ├── sources/      ← Slide summaries
-│   └── exam-prep/    ← Practice questions
+│   ├── concepts/         ← Concept pages (one per concept, with diagrams)
+│   ├── courses/          ← Course overviews (auto-created on ingest)
+│   ├── sources/          ← Slide summaries
+│   ├── exam-prep/        ← Practice questions
+│   ├── connections-log.md  ← Cross-course link discovery log
+│   ├── contradictions.md   ← Contradiction & tension tracker
+│   ├── glossary.md         ← Bilingual term index (auto-populated)
+│   ├── overview.md         ← Cross-course synthesis (auto-updated)
+│   ├── index.md            ← Master catalog
+│   └── hot.md              ← AI context cache (read first each session)
 ├── Home.md           ← Obsidian dashboard
 │
 │   AI tool config — no need to touch these:
