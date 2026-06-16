@@ -50,6 +50,7 @@ tags: [concept, {domain}]
 courses: [COMP6713]
 confidence: low|medium|high
 last_reviewed: YYYY-MM-DD
+created_at: YYYY-MM-DD
 ---
 ```
 章节: 直觉 Intuition（费曼风格）→ 详细解释 Detailed → [图解 Diagram，可选，见 wiki-diagram skill] → 为什么重要 Why → 连接 Connections（含跨课程）→ 来源 Sources → 待解决 Open Questions
@@ -62,7 +63,15 @@ last_reviewed: YYYY-MM-DD
 ## 来源页格式 Source Page
 
 文件: `wiki/sources/{name}.md`
-关键要点(3-5) → 图表描述(标注是否建议用 Mermaid 重绘，见 wiki-diagram skill) → 新概念列表 → 更新了哪些页面
+```yaml
+---
+tags: [source, {course-code}]
+course: {COURSE-CODE}
+ingested: YYYY-MM-DD
+source_file: raw/{course}/{filename}
+---
+```
+章节: 关键要点(3-5) → 图表描述(标注是否建议用 Mermaid 重绘，见 wiki-diagram skill) → 新概念列表 → 更新了哪些页面
 
 ## Hot Cache 内容
 
