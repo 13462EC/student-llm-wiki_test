@@ -1,6 +1,6 @@
 ---
 tags: [meta, glossary]
-updated: 2026-05-25
+updated: 2026-07-28
 ---
 
 # 术语表 Glossary
@@ -17,8 +17,12 @@ updated: 2026-05-25
 
 | 英文 English | 中文 Chinese | 领域 Domain | 页面 Page |
 |---|---|---|---|
-| *等待 ingest 填充* | | | |
+| Spectrum of the Laplacian | Laplace 算子的谱 | 黎曼几何/分析 | [[Spectrum-of-Laplacian]] |
+| Heat kernel asymptotics | 热核渐近 | 黎曼几何/分析 | [[Heat-Kernel-Asymptotics]] |
+| Wave equation & length spectrum | 波方程与长度谱 | 黎曼几何/微局部分析 | [[Wave-Equation-Length-Spectrum]] |
+| First eigenvalue (λ₁) | 第一特征值 | 黎曼几何/分析 | [[First-Eigenvalue]] |
+| Isospectral manifolds | 等谱流形 | 黎曼几何/反问题 | [[Isospectral-Manifolds]] |
 
 ---
 
-*最后更新 Last updated: 2026-05-25*
+*最后更新 Last updated: 2026-07-28*

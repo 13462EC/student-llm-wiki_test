@@ -1,4 +1,21 @@
 {
   "version": 1,
-  "sources": {}
+  "sources": {
+    "raw/Riemann/ch9.pdf": {
+      "hash": "14ea9bf993269094ababc0c1900e1ea6",
+      "course": "Riemann",
+      "ingested_at": "2026-07-28",
+      "pages_created": ["wiki/sources/Riemann-ch9.md"],
+      "concepts_created": [
+        "Spectrum-of-Laplacian",
+        "Heat-Kernel-Asymptotics",
+        "Wave-Equation-Length-Spectrum",
+        "First-Eigenvalue",
+        "Isospectral-Manifolds"
+      ],
+      "concepts_updated": [],
+      "connections_found": 0,
+      "contradictions_found": 0
+    }
+  }
 }
